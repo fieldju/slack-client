@@ -22,7 +22,7 @@ public class SlackClientIntegrationTest {
     public void testThatMessageGetsSent() {
         // no assertion here, must go manually look at slack channel
         client.sendMessage("Hello");
-        client.sendMessage("Hello Again", "custom-name", ":dog:");
+        client.sendMessageWithEmoji("Hello Again", "custom-name", ":dog:");
     }
 
 }

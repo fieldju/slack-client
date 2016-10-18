@@ -1,5 +1,5 @@
 group 'com.fieldju'
-version '1.0.1'
+version '2.0.0'
 
 buildscript {
     repositories {
@@ -47,9 +47,7 @@ task integrationTest(type: Test) {
 
     // copy the needed props to the int tests
     systemProperties = [
-            arn: System.getProperty('arn'),
-            bucketName: System.getProperty('bucketName'),
-            logKey: System.getProperty('logKey')
+            webHookUrl: System.getProperty('webHookUrl')
     ]
 }
 

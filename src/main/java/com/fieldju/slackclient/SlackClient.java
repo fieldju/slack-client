@@ -12,13 +12,14 @@ import java.io.IOException;
  */
 public class SlackClient {
 
-    private static final String MESSAGE_TEMPLATE = "{\"username\":\"%s\",\"icon_emoji\":\"%s\",\"text\":\"%s\"}";
     private static final String DEFAULT_USERNAME = "slack-client";
     private static final String DEFAULT_ICON_EMOJi = ":wolf:";
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     private String username = DEFAULT_USERNAME;
     private String iconEmoji = DEFAULT_ICON_EMOJi;
+    private String iconUrl;
+    private String channel;
 
     private final OkHttpClient client;
     private final String webHookUrl;
@@ -49,33 +50,89 @@ public class SlackClient {
     }
 
     /**
-     * Override the default username for future messages sent to Slack
-     * @param iconEmoji The icon emoji or image url to use as the avatar for new messages sent
+     * Override the default icon emoji for future messages sent to Slack
+     * @param iconEmoji The icon emoji to use as the avatar for new messages sent
      */
     public void setIconEmoji(String iconEmoji) {
         this.iconEmoji = iconEmoji;
     }
 
     /**
-     * Send a message to slack using the configured or default username and iconEmoji.
-     * @param message The message to send to slack through the web hook.
+     * Override the default icon emoji and use an image url for future messages sent to Slack
+     * @param iconUrl The icon url to use as the avatar for new messages sent
      */
-    public void sendMessage(String message) {
-        sendMessage(message, username, iconEmoji);
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
     }
 
     /**
-     * Send a message to slack customizing username and the iconEmoji
-     * @param message The message to send to slack through the web hook.
-     * @param userName The username to send the message as.
-     * @param iconEmoji The icon emoji or image url to use as the avatar.
+     * Send a message to slack using the configured or default username and icon.
+     * @param text The message to send to slack through the web hook.
      */
-    public void sendMessage(String message, String userName, String iconEmoji) {
+    public void sendMessage(String text) {
+        if (iconUrl != null) {
+            sendMessageWithIconUrl(text, username, iconUrl, channel);
+        } else {
+            sendMessageWithEmoji(text, username, iconEmoji, channel);
+        }
+    }
+
+    /**
+     * Send a message to slack customizing username and the icon
+     * @param text The message to send to slack through the web hook.
+     * @param userName The username to send the message as.
+     * @param iconUrl The image url to use as the avatar.
+     * @param channel The channel, if null will not be including in message request, using the default channel for the hook
+     */
+    public void sendMessageWithIconUrl(String text, String userName, String iconUrl, String channel) {
+        Message.Builder builder = new Message.Builder(text).userName(userName).iconUrl(iconUrl).channel(channel);
+        sendMessage(builder.build());
+    }
+
+    /**
+     * Send a message to slack customizing username and the icon
+     * @param text The message to send to slack through the web hook.
+     * @param userName The username to send the message as.
+     * @param iconUrl The image url to use as the avatar.
+     */
+    public void sendMessageWithIconUrl(String text, String userName, String iconUrl) {
+        Message.Builder builder = new Message.Builder(text).userName(userName).iconUrl(iconUrl);
+        sendMessage(builder.build());
+    }
+
+    /**
+     * Send a message to slack customizing username and the icon
+     * @param text The message to send to slack through the web hook.
+     * @param userName The username to send the message as.
+     * @param iconEmoji The icon emoji to use as the avatar.
+     * @param channel The channel, if null will not be including in message request, using the default channel for the hook
+     */
+    public void sendMessageWithEmoji(String text, String userName, String iconEmoji, String channel) {
+        Message.Builder builder = new Message.Builder(text).userName(userName).iconEmoji(iconEmoji).channel(channel);
+        sendMessage(builder.build());
+    }
+
+    /**
+     * Send a message to slack customizing username and the icon
+     * @param text The message to send to slack through the web hook.
+     * @param userName The username to send the message as.
+     * @param iconEmoji The icon emoji to use as the avatar.
+     */
+    public void sendMessageWithEmoji(String text, String userName, String iconEmoji) {
+        Message.Builder builder = new Message.Builder(text).userName(userName).iconEmoji(iconEmoji);
+        sendMessage(builder.build());
+    }
+
+    /**
+     * Send a message with complete control of what is sent to slack
+     * @param message The message to send to slack
+     */
+    public void sendMessage(Message message) {
         try {
             client.newCall(
                     new Request.Builder()
                             .url(webHookUrl)
-                            .post(RequestBody.create(JSON, String.format(MESSAGE_TEMPLATE, userName, iconEmoji, message)))
+                            .post(RequestBody.create(JSON, message.toJson()))
                             .build()
             ).execute();
         } catch (IOException e) {
