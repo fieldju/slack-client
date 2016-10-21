@@ -1,4 +1,4 @@
- [ ![Download](https://api.bintray.com/packages/fieldju/maven/slack-client/images/download.svg) ](https://bintray.com/fieldju/maven/slack-client/_latestVersion) [![Build Status](https://travis-ci.org/fieldju/slack-client.svg?branch=master)](https://travis-ci.org/fieldju/slack-client) [![][license img]][license]
+ [ ![Download](https://api.bintray.com/packages/fieldju/maven/slack-client/images/download.svg) ](https://bintray.com/fieldju/maven/slack-client/_latestVersion) [![Build Status](https://travis-ci.org/fieldju/slack-client.svg?branch=master)](https://travis-ci.org/fieldju/slack-client) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/fieldju/slack-client/master/LICENSE)
  
 # Slack Client
 Simple client for sending messages to a slack webhook url in the JVM
